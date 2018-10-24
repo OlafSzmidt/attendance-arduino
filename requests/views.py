@@ -20,13 +20,12 @@ def cardScanView(request):
     # This will check key names, key types, value types.
     post_data_form = ScanCardValidationForm(request.POST)
     if post_data_form.is_valid():
-        print("Student finding: ")
-        query_results = Student.objects.filter(nfccard__card_id=request.POST['card_id'])
-        if len(query_results) == 0:
+        student = Student.objects.filter(nfccard__card_id=request.POST['card_id']).first()
+        if student is None:
             return HttpResponse('No student found!')
 
         # We only expect one result due to DB one to one relationship.
-        return HttpResponse(f'Student found! The name is {query_results[0].first_name} {query_results[0].second_name}')
+        return HttpResponse(f'Student found! The name is {student.first_name} {student.second_name}')
     else:
         # 400 indicates incorrect syntax
         logger.error(f"POST data incorrect: {post_data_form.errors}")
