@@ -27,6 +27,7 @@ def cardScanView(request):
         # We only expect one result due to DB one to one relationship.
         return HttpResponse(f'Student found! The name is {student.first_name} {student.second_name}')
     else:
-        # 400 indicates incorrect syntax
+        # 400 indicates incorrect syntax. We don't need a HttpResponse, this is only seen by the 
+        # administrator of the system so logging is sufficient.
         logger.error(f"POST data incorrect: {post_data_form.errors}")
         return HttpResponse(status=400)
