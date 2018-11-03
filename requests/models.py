@@ -68,7 +68,7 @@ class Event(models.Model):
 class Attendance(models.Model):
     '''Attendance model is used to output results once students have marked
     themselves'''
-    student = models.ForeignKey(Student)
-    event = models.ForeignKey(Event)
+    # TODO: test if cascade deletes attendance when student is deleted or the other way around
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
     attended = models.BooleanField(default=False)
-    
