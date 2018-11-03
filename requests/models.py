@@ -10,7 +10,7 @@ class Person(models.Model):
 
     class Meta:
         abstract = True
-            
+
 class Student(Person):
     '''Subclass of Person, no added functionality.'''
 
@@ -30,7 +30,7 @@ class NFCCard(models.Model):
     student = models.OneToOneField(Student, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return str(self.card_id)
+        return f'{self.card_id} ({self.student.first_name} {self.student.second_name})'
 
 class Event(models.Model):
     date = models.DateField(u'Date of the event', help_text=u'YYYY:MM:DD')
@@ -38,6 +38,6 @@ class Event(models.Model):
     end_time = models.TimeField(u'End time', help_text=u'HH:MM')
     notes = models.TextField(u'Event notes or comments', help_text=u'Event notes or comments')
     course = models.ForeignKey(Course, blank=False, null=False, on_delete=models.PROTECT)
-    
+
     def __str__(self):
         return f'{self.course.title} ({self.date} {self.start_time})'
