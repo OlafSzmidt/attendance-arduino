@@ -60,7 +60,7 @@ class Event(models.Model):
     start_time = models.TimeField(u'Starting time', help_text=u'HH:MM')
     end_time = models.TimeField(u'End time', help_text=u'HH:MM')
     notes = models.TextField(u'Event notes or comments', help_text=u'Event notes or comments')
-    course = models.ForeignKey(Course, blank=False, null=False, on_delete=models.PROTECT)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.course.title} ({self.date} {self.start_time})'
