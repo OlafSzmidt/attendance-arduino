@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from requests.forms import ScanCardValidationForm
-from requests.models import Student, NFCCard, Event
+from requests.models import Student, NFCCard, Event, Attendance, Course
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -35,11 +35,14 @@ def cardScanView(request):
         # Find the event that the student is enrolling for
         # TODO: find some grace periods after and before. What if a lecture is straight after?
         # TODO: Filter student events based on start_time, end_time and current time as well as student courses above
-        # TODO: check for no events returned?
-        student_events = Event.objects.filter(course__in=student_courses)
+        # TODO: check for no events returned? check if more than 1, return error, log it
+        student_event = Event.objects.filter(course__in=student_courses)
 
         # TODO: now use the Attendance model to mark the student's event and student as present.
-        return HttpResponse(f'Student found! The name is {student.first_name} {student.second_name}')
+        # Mark attendance and create an object
+        attendance = Attendance.objects.create(student=student, event=student_event.first(), attended=True)
+
+        return HttpResponse(f'Student attendance marked. The name is {student.first_name} {student.second_name}')
     else:
         # 400 indicates incorrect syntax. We don't need a HttpResponse, this is only seen by the
         # administrator of the system so logging is sufficient.
