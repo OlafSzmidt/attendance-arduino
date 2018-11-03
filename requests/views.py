@@ -3,13 +3,23 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from requests.forms import ScanCardValidationForm
-from requests.models import Student, NFCCard, Event, Attendance, Course
+from requests.models import Student, Lecturer, NFCCard, Event, Attendance, Course
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 def homePageView(request):
-    return HttpResponse('Hello World!')
+    return render(request, 'requests/home.html')
+
+def myCoursesView(request):
+    # Just presume the first lecturer is logged in for now
+    # TODO: once logging in is added, add a check here
+    lecturer = Lecturer.objects.all().first()
+
+    # Get courses only for the logged in lecturer
+    courses_taught = Course.objects.filter(leader=lecturer)
+
+    return render(request, 'requests/courses.html', {'courses': courses_taught})
 
 @csrf_exempt
 def cardScanView(request):
