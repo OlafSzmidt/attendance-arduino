@@ -11,7 +11,7 @@ class ScanCardValidationForm(forms.Form):
         # Is it valid?
         if not valid:
             return valid
-        
+
         # TODO: check if card_id correlates to DB entry. Make github issue
         # TODO: check all types and vals
         # TODO; check all names

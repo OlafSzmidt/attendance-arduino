@@ -33,7 +33,9 @@ class Student(Person):
     '''Subclass of Person, no added functionality.'''
 
 class Lecturer(Person):
-    '''Subclass of Person, no added functionality.'''
+    '''Subclass of Person, difference in functionality from Student is that
+    these objects have a 1-1 relationship with a User.'''
+    # user = models.OneToOneField(User)
 
 class Course(models.Model):
     '''Course which is being taught by a single lecturer and attended by many
