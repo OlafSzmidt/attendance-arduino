@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from requests.forms import ScanCardValidationForm, AddANewLecturerForm
 from requests.models import Student, Lecturer, NFCCard, Event, Attendance, Course
 from requests.helpers import generate_random_username
@@ -39,10 +40,12 @@ def addLecturerStaffView(request):
             return
     return render(request, 'requests/add_lecturer.html', {'form': AddANewLecturerForm})
 
+@login_required
 def myCoursesView(request):
-    # Just presume the first lecturer is logged in for now
-    # TODO: once logging in is added, add a check here
-    lecturer = Lecturer.objects.all().first()
+    logged_in_user = request.user
+
+    # Find corresponding lecturer
+    lecturer = Lecturer.objects.filter(user=logged_in_user).first()
 
     # Get courses only for the logged in lecturer
     courses_taught = Course.objects.filter(leader=lecturer)
