@@ -1,6 +1,7 @@
 from django import forms
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 
 class Person(models.Model):
     '''Abstract model to be inherited by Student or Lecturer'''
@@ -35,14 +36,14 @@ class Student(Person):
 class Lecturer(Person):
     '''Subclass of Person, difference in functionality from Student is that
     these objects have a 1-1 relationship with a User.'''
-    # user = models.OneToOneField(User)
+    user = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
 
 class Course(models.Model):
     '''Course which is being taught by a single lecturer and attended by many
     students. Not to be confused with Event.'''
     title = models.CharField(max_length=40)
-    leader = models.ForeignKey(Lecturer, null=True, on_delete=models.SET_NULL)
-    students = models.ManyToManyField(Student)
+    leader = models.ForeignKey(Lecturer, blank=True, null=True, on_delete=models.SET_NULL)
+    students = models.ManyToManyField(Student, blank=True)
 
     def __str__(self):
         return self.title

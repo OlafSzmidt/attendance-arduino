@@ -1,4 +1,5 @@
 from django import forms
+from .models import Lecturer, Course
 
 class ScanCardValidationForm(forms.Form):
     card_id = forms.IntegerField()
@@ -28,3 +29,17 @@ class ScanCardValidationForm(forms.Form):
             return False
 
         return True
+
+
+class AddANewLecturerForm(forms.ModelForm):
+    class Meta:
+        model = Lecturer
+        fields = ['first_name' , 'second_name']
+        widgets = {
+                'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'second_name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    courses_to_lead = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Course.objects.all())
+    # first_name =  forms.CharField(max_length=30)
+    # surname =  forms.CharField(max_length=30)

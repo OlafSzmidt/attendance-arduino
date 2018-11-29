@@ -2,14 +2,38 @@ import logging
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from requests.forms import ScanCardValidationForm
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.models import User
+from requests.forms import ScanCardValidationForm, AddANewLecturerForm
 from requests.models import Student, Lecturer, NFCCard, Event, Attendance, Course
+from requests.helpers import generate_random_username
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 def homePageView(request):
     return render(request, 'requests/home.html')
+
+@staff_member_required
+def addLecturerStaffView(request):
+    if request.method == 'POST':
+        # Form submitted
+        submitted_form = AddANewLecturerForm(request.POST)
+
+        if submitted_form.is_valid():
+            # Create a new user account
+            # TODO: add email to user and then send emails with credentials
+            random_username = generate_random_username(length=6)
+            random_password = User.objects.make_random_password()
+            logger.info(f'Random username generated: {random_username}')
+            new_user = User.objects.create_user(username=random_username, password=random_password)
+
+            # User created, now a lecturer object
+            lecturer = Lecturer.objects.create(first_name=submitted_form.cleaned_data['first_name'],
+                                               second_name=submitted_form.cleaned_data['second_name'],
+                                               user=new_user)
+
+    return render(request, 'requests/add_lecturer.html', {'form': AddANewLecturerForm})
 
 def myCoursesView(request):
     # Just presume the first lecturer is logged in for now
