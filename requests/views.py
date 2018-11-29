@@ -1,6 +1,6 @@
 import logging
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
@@ -26,13 +26,17 @@ def addLecturerStaffView(request):
             random_username = generate_random_username(length=6)
             random_password = User.objects.make_random_password()
             logger.info(f'Random username generated: {random_username}')
-            new_user = User.objects.create_user(username=random_username, password=random_password)
+            new_user = User.objects.create_user(username=random_username,
+                                                password=random_password)
 
             # User created, now a lecturer object
             lecturer = Lecturer.objects.create(first_name=submitted_form.cleaned_data['first_name'],
                                                second_name=submitted_form.cleaned_data['second_name'],
                                                user=new_user)
 
+            return HttpResponseRedirect('/addedLecturerSuccess/')
+        else:
+            return
     return render(request, 'requests/add_lecturer.html', {'form': AddANewLecturerForm})
 
 def myCoursesView(request):
