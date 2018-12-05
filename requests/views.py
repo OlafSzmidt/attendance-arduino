@@ -37,7 +37,8 @@ def addLecturerStaffView(request):
 
             return HttpResponseRedirect('/addedLecturerSuccess/')
         else:
-            return
+            return HttpResponse('Incorrect data submitted!')
+
     return render(request, 'requests/add_lecturer.html', {'form': AddANewLecturerForm})
 
 @login_required
