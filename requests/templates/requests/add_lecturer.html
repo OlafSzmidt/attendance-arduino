@@ -1,0 +1,15 @@
+{% extends "requests/base.html" %}
+
+{% block content %}
+<h2>Add a new lecturer account</h2>
+<form method="post">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="form-group">
+      <label for={{field.id_for_label}}><b>{{ field.label_tag }} </b></label>
+      {{ field }}
+    </div>
+  {% endfor %}
+  <button type="submit">Create Lecturer</button>
+</form>
+{% endblock content %}

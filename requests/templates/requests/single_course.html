@@ -1,0 +1,39 @@
+{% extends "requests/base.html" %}
+
+{% block content %}
+  <h1> {{course.title}} </h1>
+
+  <dl class="row">
+  <dt class="col-sm-3">Course Leader</dt>
+  <dd class="col-sm-9">{{ course.leader }}</dd>
+
+  <dt class="col-sm-3">Number of Students:</dt>
+  <dd class="col-sm-9">{{ course.students.count }}</dd>
+
+  <dt class="col-sm-3">Lecture Locations: </dt>
+  <dd class="col-sm-9">
+    <!-- Don't show a comma after last item -->
+    {% for lecture_hall in lecture_halls %}
+      {% if forloop.last %}
+        {{ lecture_hall }}
+      {% else %}
+        {{ lecture_hall }},
+      {% endif %}
+    {% endfor %}
+  </dd>
+
+
+  <dt class="col-sm-3">Lab Locations: </dt>
+  <dd class="col-sm-9">
+    <!-- Don't show a comma after last item -->
+    {% for lab_hall in lab_halls %}
+      {% if forloop.last %}
+        {{ lab_hall }}
+      {% else %}
+        {{ lab_hall }},
+      {% endif %}
+    {% endfor %}
+  </dd>
+
+  Single course view.
+{% endblock content %}

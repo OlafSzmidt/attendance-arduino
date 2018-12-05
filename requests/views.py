@@ -1,15 +1,57 @@
 import logging
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
-from requests.forms import ScanCardValidationForm
-from requests.models import Student, NFCCard, Event, Attendance, Course
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from requests.forms import ScanCardValidationForm, AddANewLecturerForm
+from requests.models import Student, Lecturer, NFCCard, Event, Attendance, Course
+from requests.helpers import generate_random_username
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 def homePageView(request):
-    return HttpResponse('Hello World!')
+    return render(request, 'requests/home.html')
+
+@staff_member_required
+def addLecturerStaffView(request):
+    if request.method == 'POST':
+        # Form submitted
+        submitted_form = AddANewLecturerForm(request.POST)
+
+        if submitted_form.is_valid():
+            # Create a new user account
+            # TODO: add email to user and then send emails with credentials
+            random_username = generate_random_username(length=6)
+            random_password = User.objects.make_random_password()
+            logger.info(f'Random username generated: {random_username}')
+            new_user = User.objects.create_user(username=random_username,
+                                                password=random_password)
+
+            # User created, now a lecturer object
+            lecturer = Lecturer.objects.create(first_name=submitted_form.cleaned_data['first_name'],
+                                               second_name=submitted_form.cleaned_data['second_name'],
+                                               user=new_user)
+
+            return HttpResponseRedirect('/addedLecturerSuccess/')
+        else:
+            return HttpResponse('Incorrect data submitted!')
+
+    return render(request, 'requests/add_lecturer.html', {'form': AddANewLecturerForm})
+
+@login_required
+def myCoursesView(request):
+    logged_in_user = request.user
+
+    # Find corresponding lecturer
+    lecturer = Lecturer.objects.filter(user=logged_in_user).first()
+
+    # Get courses only for the logged in lecturer
+    courses_taught = Course.objects.filter(leader=lecturer)
+
+    return render(request, 'requests/courses.html', {'courses': courses_taught})
 
 @csrf_exempt
 def cardScanView(request):
@@ -48,3 +90,8 @@ def cardScanView(request):
         # administrator of the system so logging is sufficient.
         logger.error(f"POST data incorrect: {post_data_form.errors}")
         return HttpResponse(status=400)
+
+@login_required
+def viewCourseView(request, course_title):
+    course = Course.objects.filter(title=course_title).first()
+    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all(), 'lab_halls': course.labs.all()})

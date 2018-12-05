@@ -1,6 +1,7 @@
 from django import forms
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 
 class Person(models.Model):
     '''Abstract model to be inherited by Student or Lecturer'''
@@ -33,15 +34,33 @@ class Student(Person):
     '''Subclass of Person, no added functionality.'''
 
 class Lecturer(Person):
-    '''Subclass of Person, no added functionality.'''
+    '''Subclass of Person, difference in functionality from Student is that
+    these objects have a 1-1 relationship with a User.'''
+    user = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
+
+class LectureHall(models.Model):
+    '''A location model to be connected to courses to then view as options.'''
+    name = models.CharField(max_length=12, null=False)
+
+    def __str__(self):
+        return self.name
+
+class LaboratoryHall(models.Model):
+    '''A location model to be connected to courses to then view as options.'''
+    name = models.CharField(max_length=12, null=False)
+
+    def __str__(self):
+        return self.name
 
 class Course(models.Model):
     '''Course which is being taught by a single lecturer and attended by many
     students. Not to be confused with Event.'''
     title = models.CharField(max_length=40)
-    leader = models.ForeignKey(Lecturer, null=True, on_delete=models.SET_NULL)
-    students = models.ManyToManyField(Student)
-
+    leader = models.ForeignKey(Lecturer, blank=True, null=True, on_delete=models.SET_NULL)
+    students = models.ManyToManyField(Student, blank=True)
+    lectures = models.ManyToManyField(LectureHall, blank=False)
+    labs = models.ManyToManyField(LaboratoryHall, blank=False)
+    
     def __str__(self):
         return self.title
 
