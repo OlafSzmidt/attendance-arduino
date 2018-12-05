@@ -2,6 +2,39 @@
 
 {% block content %}
   <h1> {{course.title}} </h1>
-  
+
+  <dl class="row">
+  <dt class="col-sm-3">Course Leader</dt>
+  <dd class="col-sm-9">{{ course.leader }}</dd>
+
+  <dt class="col-sm-3">Number of Students:</dt>
+  <dd class="col-sm-9">{{ course.students.count }}</dd>
+
+  <dt class="col-sm-3">Lecture Locations: </dt>
+  <dd class="col-sm-9">
+    <!-- Don't show a comma after last item -->
+    {% for lecture_hall in lecture_halls %}
+      {% if forloop.last %}
+        {{ lecture_hall }}
+      {% else %}
+        {{ lecture_hall }},
+      {% endif %}
+    {% endfor %}
+  </dd>
+
+
+  <dt class="col-sm-3">Lab Locations: </dt>
+  <dd class="col-sm-9">Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</dd>
+
+  <dt class="col-sm-3">Nesting</dt>
+  <dd class="col-sm-9">
+    <dl class="row">
+      <dt class="col-sm-4">Nested definition list</dt>
+      <dd class="col-sm-8">Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc.</dd>
+    </dl>
+  </dd>
+</dl>
+
+
   Single course view.
 {% endblock content %}
