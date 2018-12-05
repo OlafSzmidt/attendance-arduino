@@ -94,4 +94,4 @@ def cardScanView(request):
 @login_required
 def viewCourseView(request, course_title):
     course = Course.objects.filter(title=course_title).first()
-    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all()})
+    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all(), 'lab_halls': course.labs.all()})

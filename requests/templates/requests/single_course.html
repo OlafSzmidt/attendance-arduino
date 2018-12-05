@@ -24,17 +24,16 @@
 
 
   <dt class="col-sm-3">Lab Locations: </dt>
-  <dd class="col-sm-9">Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</dd>
-
-  <dt class="col-sm-3">Nesting</dt>
   <dd class="col-sm-9">
-    <dl class="row">
-      <dt class="col-sm-4">Nested definition list</dt>
-      <dd class="col-sm-8">Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc.</dd>
-    </dl>
+    <!-- Don't show a comma after last item -->
+    {% for lab_hall in lab_halls %}
+      {% if forloop.last %}
+        {{ lab_hall }}
+      {% else %}
+        {{ lab_hall }},
+      {% endif %}
+    {% endfor %}
   </dd>
-</dl>
-
 
   Single course view.
 {% endblock content %}

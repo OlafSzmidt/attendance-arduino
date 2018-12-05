@@ -40,7 +40,14 @@ class Lecturer(Person):
 
 class LectureHall(models.Model):
     '''A location model to be connected to courses to then view as options.'''
-    name = models.CharField(max_length=10, null=False)
+    name = models.CharField(max_length=12, null=False)
+
+    def __str__(self):
+        return self.name
+
+class LaboratoryHall(models.Model):
+    '''A location model to be connected to courses to then view as options.'''
+    name = models.CharField(max_length=12, null=False)
 
     def __str__(self):
         return self.name
@@ -52,6 +59,8 @@ class Course(models.Model):
     leader = models.ForeignKey(Lecturer, blank=True, null=True, on_delete=models.SET_NULL)
     students = models.ManyToManyField(Student, blank=True)
     lectures = models.ManyToManyField(LectureHall, blank=False)
+    labs = models.ManyToManyField(LaboratoryHall, blank=False)
+    
     def __str__(self):
         return self.title
 
