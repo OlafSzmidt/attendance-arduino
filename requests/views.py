@@ -90,3 +90,8 @@ def cardScanView(request):
         # administrator of the system so logging is sufficient.
         logger.error(f"POST data incorrect: {post_data_form.errors}")
         return HttpResponse(status=400)
+
+@login_required
+def viewCourseView(request, course_title):
+    course = Course.objects.filter(title=course_title).first()
+    return render(request, 'requests/single_course.html', {'course': course})

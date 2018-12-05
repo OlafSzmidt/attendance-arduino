@@ -4,7 +4,7 @@
   {% if user.is_authenticated %}
     <div class="list-group">
     {% for course in courses %}
-    <a href="#" class="list-group-item list-group-item-action">{{course.title}}</a>
+    <a href="{% url 'viewCourse' course_title=course.title %}" class="list-group-item list-group-item-action">{{course.title}}</a>
     {% endfor %}
     </div>
   {% else %}
