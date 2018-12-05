@@ -51,7 +51,7 @@ class Course(models.Model):
     title = models.CharField(max_length=40)
     leader = models.ForeignKey(Lecturer, blank=True, null=True, on_delete=models.SET_NULL)
     students = models.ManyToManyField(Student, blank=True)
-    lectures = models.ManyToManyField(LectureHall, blank=True)
+    lectures = models.ManyToManyField(LectureHall, blank=False)
     def __str__(self):
         return self.title
 
