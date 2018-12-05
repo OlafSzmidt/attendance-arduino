@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from requests.forms import ScanCardValidationForm, AddANewLecturerForm
+from requests.forms import ScanCardValidationForm, AddANewLecturerForm, AddANewStudentForm, AddANFCCardForm
 from requests.models import Student, Lecturer, NFCCard, Event, Attendance, Course
 from requests.helpers import generate_random_username
 
@@ -14,6 +14,25 @@ logger = logging.getLogger(__name__)
 
 def homePageView(request):
     return render(request, 'requests/home.html')
+
+@staff_member_required
+def addStudentAndCardView(request):
+    if request.method == 'POST':
+        # Form submitted
+        student_form = AddANewStudentForm(request.POST)
+        nfc_form = AddANFCCardForm(request.POST)
+
+        if student_form.is_valid() and nfc_form.is_valid():
+            student = Student.objects.create(first_name=student_form.cleaned_data['first_name'],
+                                             second_name=student_form.cleaned_data['second_name'])
+            nfc_card = NFCCard.objects.create(card_id=nfc_form.cleaned_data['card_id'],
+                                              student=student)
+
+            return HttpResponseRedirect('/addedStudentSuccess/')
+        else:
+            return HttpResponse('Incorrect data submitted!')
+
+    return render(request, 'requests/add_students_and_cards.html', {'student_form': AddANewStudentForm, 'nfc_form': AddANFCCardForm})
 
 @staff_member_required
 def addLecturerStaffView(request):
@@ -70,17 +89,12 @@ def cardScanView(request):
         logger.info(f'Student found! The name is {student.first_name} {student.second_name}')
 
         # Get all courses student is enrolled in
-        # TODO: do some checks here if student courses is empty
         student_courses = Course.objects.filter(students=student)
         logger.info(f'Student courses found: {student_courses}')
 
         # Find the event that the student is enrolling for
-        # TODO: find some grace periods after and before. What if a lecture is straight after?
-        # TODO: Filter student events based on start_time, end_time and current time as well as student courses above
-        # TODO: check for no events returned? check if more than 1, return error, log it
         student_event = Event.objects.filter(course__in=student_courses)
 
-        # TODO: now use the Attendance model to mark the student's event and student as present.
         # Mark attendance and create an object
         attendance = Attendance.objects.create(student=student, event=student_event.first(), attended=True)
 
@@ -94,4 +108,10 @@ def cardScanView(request):
 @login_required
 def viewCourseView(request, course_title):
     course = Course.objects.filter(title=course_title).first()
-    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all(), 'lab_halls': course.labs.all()})
+    events = Event.objects.filter(course=course)
+    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all(), 'lab_halls': course.labs.all(), 'events': events})
+
+@login_required
+def viewEventView(request, event_id):
+    event = Event.objects.filter(id=event_id).first()
+    return render(request, 'requests/single_event.html', {'event': event})

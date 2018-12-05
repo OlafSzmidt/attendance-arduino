@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 
 class Person(models.Model):
     '''Abstract model to be inherited by Student or Lecturer'''
+    class Meta:
+        unique_together = ["first_name", "second_name"]
+
     first_name = models.CharField(max_length=30,
                                   validators=[
                                     RegexValidator(
@@ -60,14 +63,14 @@ class Course(models.Model):
     students = models.ManyToManyField(Student, blank=True)
     lectures = models.ManyToManyField(LectureHall, blank=False)
     labs = models.ManyToManyField(LaboratoryHall, blank=False)
-    
+
     def __str__(self):
         return self.title
 
 class NFCCard(models.Model):
     '''An NFC card which is being scanned by the arduino and is connected to a
     single student'''
-    card_id = models.IntegerField()
+    card_id = models.IntegerField(null=False, unique=True)
     student = models.OneToOneField(Student, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
