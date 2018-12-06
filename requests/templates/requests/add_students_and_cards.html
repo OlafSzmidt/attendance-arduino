@@ -1,7 +1,7 @@
 {% extends "requests/base.html" %}
 
 {% block content %}
-  <h2>Add a new lecturer account</h2>
+  <h2>Add a new student account</h2>
   <form method="post">
     {% csrf_token %}
     {% for field in student_form %}
@@ -16,6 +16,6 @@
         {{ field }}
       </div>
     {% endfor %}
-    <button type="submit">Create Student</button>
+    <button class="btn btn-primary" type="submit">Create Student</button>
   </form>
 {% endblock content %}

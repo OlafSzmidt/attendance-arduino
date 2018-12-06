@@ -1,12 +1,16 @@
 import logging
+import csv
+import io
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from requests.forms import ScanCardValidationForm, AddANewLecturerForm, AddANewStudentForm, AddANFCCardForm
-from requests.models import Student, Lecturer, NFCCard, Event, Attendance, Course
+from requests.forms import (ScanCardValidationForm, AddANewLecturerForm,
+                            AddANewStudentForm, AddANFCCardForm, AddCourseForm)
+from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
+                             Course)
 from requests.helpers import generate_random_username
 
 # Get an instance of a logger
@@ -14,6 +18,52 @@ logger = logging.getLogger(__name__)
 
 def homePageView(request):
     return render(request, 'requests/home.html')
+
+@staff_member_required
+def addCourseView(request):
+    if request.method == 'POST':
+        # Form submitted
+        course_form = AddCourseForm(request.POST, request.FILES)
+        line_counter = 0
+        students_from_csv = []
+        students_not_found = []
+
+        if course_form.is_valid():
+            csv_file = request.FILES['file']
+            decoded_file = csv_file.read().decode('utf-8')
+            io_string = io.StringIO(decoded_file)
+            csv_reader = csv.reader(io_string, delimiter=',')
+
+            for row in csv_reader:
+                if line_counter == 0:
+                    line_counter += 1
+                    pass
+                else:
+                    student = Student.objects.filter(first_name=row[0], second_name=row[1]).first()
+                    if student is None:
+                        students_not_found.append(str(row[0]) + ' ' + str(row[1]))
+                    else:
+                        students_from_csv.append(student)
+
+                    line_counter += 1
+
+            course = Course.objects.create(title=course_form.cleaned_data['title'],
+                                           leader=course_form.cleaned_data['leader']
+                                           )
+
+            course.lectures.set(course_form.cleaned_data['lectures'])
+            course.labs.set(course_form.cleaned_data['labs'])
+
+            if len(students_from_csv) > 0:
+                course.students.set(students_from_csv)
+
+            course.save()
+
+            return render(request, 'requests/addedCourseSuccess.html', {'students_not_found': students_not_found})
+        else:
+            print(course_form.errors)
+            return HttpResponse("Invalid data submitted!")
+    return render(request, 'requests/add_course.html',  {'form': AddCourseForm})
 
 @staff_member_required
 def addStudentAndCardView(request):

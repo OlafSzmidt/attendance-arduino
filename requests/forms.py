@@ -58,3 +58,16 @@ class AddANFCCardForm(forms.ModelForm):
         widgets = {
                 'card_id': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+class AddCourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['title', 'leader', 'lectures', 'labs']
+        widgets = {
+                'title': forms.TextInput(attrs={'class': 'form-control'}),
+                'leader': forms.Select(attrs={'class': 'form-control'}),
+                'lectures': forms.SelectMultiple(attrs={'class': 'form-control'}),
+                'labs': forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
+
+    file = forms.FileField()

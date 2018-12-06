@@ -1,0 +1,16 @@
+{% extends "requests/base.html" %}
+
+{% block content %}
+  <p class="h6"> You succesfully submitted a form to add a new course. </p>
+
+  {% if students_not_found %}
+    <p class="h6"> The following students were not found on the system and therefore were not added: </p>
+
+    <dl class="row">
+      {% for student in students_not_found %}
+        <dd class="col-sm-9">{{ student }}</dd>
+      {% endfor %}
+    </dl>
+  {% endif %}
+
+{% endblock content %}
