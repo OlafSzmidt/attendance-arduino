@@ -1,5 +1,14 @@
 {% extends "requests/base.html" %}
 
 {% block content %}
-  Some text
+  <h2> Event: {{event}} </h2>
+
+  <dl class="row">
+    <dt class="col-sm-3">Students enrolled:</dt>
+    <dd class="col-sm-9">{{ students_enrolled }}</dd>
+
+    <dt class="col-sm-3">Students present:</dt>
+    <dd class="col-sm-9">{{ students_marked_present }}</dd>
+  </dl>
+
 {% endblock content %}

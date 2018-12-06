@@ -164,4 +164,10 @@ def viewCourseView(request, course_title):
 @login_required
 def viewEventView(request, event_id):
     event = Event.objects.filter(id=event_id).first()
-    return render(request, 'requests/single_event.html', {'event': event})
+    attendances = Attendance.objects.filter(event=event)
+    students_enrolled = event.course.students.all().count()
+    students_marked_present = 0
+    for attendance in attendances:
+        if(attendance.attended):
+            students_marked_present += 1
+    return render(request, 'requests/single_event.html', {'event': event, 'students_enrolled': students_enrolled, 'students_marked_present': students_marked_present})

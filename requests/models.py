@@ -87,6 +87,9 @@ class Event(models.Model):
     def __str__(self):
         return f'{self.course.title} ({self.date} {self.start_time})'
 
+    def __unicode__(self):
+        return f'{self.course.title} ({self.date} {self.start_time})'
+
 class Attendance(models.Model):
     '''Attendance model is used to output results once students have marked
     themselves'''
