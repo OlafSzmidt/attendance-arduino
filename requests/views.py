@@ -8,7 +8,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from requests.forms import (ScanCardValidationForm, AddANewLecturerForm,
-                            AddANewStudentForm, AddANFCCardForm, AddCourseForm)
+                            AddANewStudentForm, AddANFCCardForm, AddCourseForm,
+                            AddEventForm)
 from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
                              Course)
 from requests.helpers import generate_random_username
@@ -111,6 +112,23 @@ def addLecturerStaffView(request):
     return render(request, 'requests/add_lecturer.html', {'form': AddANewLecturerForm})
 
 @login_required
+def addEventView(request):
+    if request.method == 'POST':
+        # form submitted
+        submitted_form = AddEventForm(request.POST)
+
+        if submitted_form.is_valid():
+            event = Event.objects.create(date=submitted_form.cleaned_data['date'],
+                                         start_time=submitted_form.cleaned_data['start_time'],
+                                         end_time=submitted_form.cleaned_data['end_time'],
+                                         notes=submitted_form.cleaned_data['notes'],
+                                         course=submitted_form.cleaned_data['course'])
+            return HttpResponseRedirect('/addedEventSuccess/')
+        else:
+            return HttpResponse('Incorrect data submitted!')
+            
+    return render(request, 'requests/add_event.html', {'form': AddEventForm})
+@login_required
 def myCoursesView(request):
     logged_in_user = request.user
 
@@ -170,4 +188,16 @@ def viewEventView(request, event_id):
     for attendance in attendances:
         if(attendance.attended):
             students_marked_present += 1
-    return render(request, 'requests/single_event.html', {'event': event, 'students_enrolled': students_enrolled, 'students_marked_present': students_marked_present})
+
+    if students_marked_present == 0:
+        students_present_percentage = 0
+    else:
+        students_present_percentage = students_enrolled / students_marked_present * 100
+
+    stats = {
+        'students_enrolled': students_enrolled,
+        'students_marked_present': students_marked_present,
+        'students_present_percentage': students_present_percentage,
+    }
+
+    return render(request, 'requests/single_event.html', {'event': event, 'stats': stats})

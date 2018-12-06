@@ -1,5 +1,5 @@
 from django import forms
-from .models import Lecturer, Course, Student, NFCCard
+from .models import Lecturer, Course, Student, NFCCard, Event
 
 class ScanCardValidationForm(forms.Form):
     card_id = forms.IntegerField()
@@ -57,6 +57,18 @@ class AddANFCCardForm(forms.ModelForm):
         fields = ['card_id']
         widgets = {
                 'card_id': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+class AddEventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['date', 'start_time', 'end_time', 'notes', 'course']
+        widgets = {
+                'date': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+                'start_time': forms.TimeInput(attrs={'class': 'form-control'}),
+                'end_time': forms.TimeInput(attrs={'class': 'form-control'}),
+                'notes': forms.TextInput(attrs={'class': 'form-control'}),
+                'course': forms.Select(attrs={'class': 'form-control'}),
         }
 
 class AddCourseForm(forms.ModelForm):

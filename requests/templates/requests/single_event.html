@@ -5,10 +5,16 @@
 
   <dl class="row">
     <dt class="col-sm-3">Students enrolled:</dt>
-    <dd class="col-sm-9">{{ students_enrolled }}</dd>
+    <dd class="col-sm-9">{{ stats.students_enrolled }}</dd>
 
     <dt class="col-sm-3">Students present:</dt>
-    <dd class="col-sm-9">{{ students_marked_present }}</dd>
+    <dd class="col-sm-9">{{ stats.students_marked_present }}</dd>
+
+    <dt class="col-sm-3">Percentage present:</dt>
+    <dd class="col-sm-9">{{ stats.students_present_percentage }}%</dd>
+
+    <dt class="col-sm-3">Event notes:</dt>
+    <dd class="col-sm-9">{{ event.notes }}</dd>
   </dl>
 
 {% endblock content %}
