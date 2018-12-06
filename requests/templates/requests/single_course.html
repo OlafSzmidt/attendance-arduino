@@ -34,6 +34,13 @@
       {% endif %}
     {% endfor %}
   </dd>
+  </dl>
 
-  Single course view.
+  <h2>Recent Course Events: </h2>
+
+  <dl class=row>
+    {% for event in events %}
+    <dt class="col-sm-9"><a href="{% url 'viewEvent' event_id=event.id %}" class="list-group-item list-group-item-action">{{ event.date }} ({{ event.start_time }})</a></dt>
+    {% endfor %}
+  </dl>
 {% endblock content %}

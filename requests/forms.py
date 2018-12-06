@@ -1,5 +1,5 @@
 from django import forms
-from .models import Lecturer, Course
+from .models import Lecturer, Course, Student, NFCCard, Event
 
 class ScanCardValidationForm(forms.Form):
     card_id = forms.IntegerField()
@@ -41,5 +41,45 @@ class AddANewLecturerForm(forms.ModelForm):
         }
 
     courses_to_lead = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Course.objects.all())
-    # first_name =  forms.CharField(max_length=30)
-    # surname =  forms.CharField(max_length=30)
+
+class AddANewStudentForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = ['first_name', 'second_name']
+        widgets = {
+                'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'second_name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class AddANFCCardForm(forms.ModelForm):
+    class Meta:
+        model = NFCCard
+        fields = ['card_id']
+        widgets = {
+                'card_id': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+class AddEventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['date', 'start_time', 'end_time', 'notes', 'course']
+        widgets = {
+                'date': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+                'start_time': forms.TimeInput(attrs={'class': 'form-control'}),
+                'end_time': forms.TimeInput(attrs={'class': 'form-control'}),
+                'notes': forms.TextInput(attrs={'class': 'form-control'}),
+                'course': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class AddCourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['title', 'leader', 'lectures', 'labs']
+        widgets = {
+                'title': forms.TextInput(attrs={'class': 'form-control'}),
+                'leader': forms.Select(attrs={'class': 'form-control'}),
+                'lectures': forms.SelectMultiple(attrs={'class': 'form-control'}),
+                'labs': forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
+
+    file = forms.FileField()

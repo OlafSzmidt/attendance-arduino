@@ -1,12 +1,17 @@
 import logging
+import csv
+import io
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from requests.forms import ScanCardValidationForm, AddANewLecturerForm
-from requests.models import Student, Lecturer, NFCCard, Event, Attendance, Course
+from requests.forms import (ScanCardValidationForm, AddANewLecturerForm,
+                            AddANewStudentForm, AddANFCCardForm, AddCourseForm,
+                            AddEventForm)
+from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
+                             Course)
 from requests.helpers import generate_random_username
 
 # Get an instance of a logger
@@ -14,6 +19,71 @@ logger = logging.getLogger(__name__)
 
 def homePageView(request):
     return render(request, 'requests/home.html')
+
+@staff_member_required
+def addCourseView(request):
+    if request.method == 'POST':
+        # Form submitted
+        course_form = AddCourseForm(request.POST, request.FILES)
+        line_counter = 0
+        students_from_csv = []
+        students_not_found = []
+
+        if course_form.is_valid():
+            csv_file = request.FILES['file']
+            decoded_file = csv_file.read().decode('utf-8')
+            io_string = io.StringIO(decoded_file)
+            csv_reader = csv.reader(io_string, delimiter=',')
+
+            for row in csv_reader:
+                if line_counter == 0:
+                    line_counter += 1
+                    pass
+                else:
+                    student = Student.objects.filter(first_name=row[0], second_name=row[1]).first()
+                    if student is None:
+                        students_not_found.append(str(row[0]) + ' ' + str(row[1]))
+                    else:
+                        students_from_csv.append(student)
+
+                    line_counter += 1
+
+            course = Course.objects.create(title=course_form.cleaned_data['title'],
+                                           leader=course_form.cleaned_data['leader']
+                                           )
+
+            course.lectures.set(course_form.cleaned_data['lectures'])
+            course.labs.set(course_form.cleaned_data['labs'])
+
+            if len(students_from_csv) > 0:
+                course.students.set(students_from_csv)
+
+            course.save()
+
+            return render(request, 'requests/addedCourseSuccess.html', {'students_not_found': students_not_found})
+        else:
+            print(course_form.errors)
+            return HttpResponse("Invalid data submitted!")
+    return render(request, 'requests/add_course.html',  {'form': AddCourseForm})
+
+@staff_member_required
+def addStudentAndCardView(request):
+    if request.method == 'POST':
+        # Form submitted
+        student_form = AddANewStudentForm(request.POST)
+        nfc_form = AddANFCCardForm(request.POST)
+
+        if student_form.is_valid() and nfc_form.is_valid():
+            student = Student.objects.create(first_name=student_form.cleaned_data['first_name'],
+                                             second_name=student_form.cleaned_data['second_name'])
+            nfc_card = NFCCard.objects.create(card_id=nfc_form.cleaned_data['card_id'],
+                                              student=student)
+
+            return HttpResponseRedirect('/addedStudentSuccess/')
+        else:
+            return HttpResponse('Incorrect data submitted!')
+
+    return render(request, 'requests/add_students_and_cards.html', {'student_form': AddANewStudentForm, 'nfc_form': AddANFCCardForm})
 
 @staff_member_required
 def addLecturerStaffView(request):
@@ -41,6 +111,23 @@ def addLecturerStaffView(request):
 
     return render(request, 'requests/add_lecturer.html', {'form': AddANewLecturerForm})
 
+@login_required
+def addEventView(request):
+    if request.method == 'POST':
+        # form submitted
+        submitted_form = AddEventForm(request.POST)
+
+        if submitted_form.is_valid():
+            event = Event.objects.create(date=submitted_form.cleaned_data['date'],
+                                         start_time=submitted_form.cleaned_data['start_time'],
+                                         end_time=submitted_form.cleaned_data['end_time'],
+                                         notes=submitted_form.cleaned_data['notes'],
+                                         course=submitted_form.cleaned_data['course'])
+            return HttpResponseRedirect('/addedEventSuccess/')
+        else:
+            return HttpResponse('Incorrect data submitted!')
+            
+    return render(request, 'requests/add_event.html', {'form': AddEventForm})
 @login_required
 def myCoursesView(request):
     logged_in_user = request.user
@@ -70,17 +157,12 @@ def cardScanView(request):
         logger.info(f'Student found! The name is {student.first_name} {student.second_name}')
 
         # Get all courses student is enrolled in
-        # TODO: do some checks here if student courses is empty
         student_courses = Course.objects.filter(students=student)
         logger.info(f'Student courses found: {student_courses}')
 
         # Find the event that the student is enrolling for
-        # TODO: find some grace periods after and before. What if a lecture is straight after?
-        # TODO: Filter student events based on start_time, end_time and current time as well as student courses above
-        # TODO: check for no events returned? check if more than 1, return error, log it
         student_event = Event.objects.filter(course__in=student_courses)
 
-        # TODO: now use the Attendance model to mark the student's event and student as present.
         # Mark attendance and create an object
         attendance = Attendance.objects.create(student=student, event=student_event.first(), attended=True)
 
@@ -94,4 +176,28 @@ def cardScanView(request):
 @login_required
 def viewCourseView(request, course_title):
     course = Course.objects.filter(title=course_title).first()
-    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all(), 'lab_halls': course.labs.all()})
+    events = Event.objects.filter(course=course)
+    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all(), 'lab_halls': course.labs.all(), 'events': events})
+
+@login_required
+def viewEventView(request, event_id):
+    event = Event.objects.filter(id=event_id).first()
+    attendances = Attendance.objects.filter(event=event)
+    students_enrolled = event.course.students.all().count()
+    students_marked_present = 0
+    for attendance in attendances:
+        if(attendance.attended):
+            students_marked_present += 1
+
+    if students_marked_present == 0:
+        students_present_percentage = 0
+    else:
+        students_present_percentage = students_enrolled / students_marked_present * 100
+
+    stats = {
+        'students_enrolled': students_enrolled,
+        'students_marked_present': students_marked_present,
+        'students_present_percentage': students_present_percentage,
+    }
+
+    return render(request, 'requests/single_event.html', {'event': event, 'stats': stats})

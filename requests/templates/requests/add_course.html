@@ -1,0 +1,19 @@
+{% extends "requests/base.html" %}
+
+{% block content %}
+  <h2>Add a new course</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        <label for={{field.id_for_label}}><b>{{ field.label_tag }} </b></label>
+        {{ field }}
+      </div>
+    {% endfor %}
+
+    <div class="alert alert-warning" role="alert">
+      Warning: The system assumes correct CSV format!
+    </div>
+    <button class="btn btn-primary" type="submit">Create Course</button>
+  </form>
+{% endblock content %}
