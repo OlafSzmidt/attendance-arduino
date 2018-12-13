@@ -1,4 +1,69 @@
 {% extends "requests/base.html" %}
+<script>
+  {% block jquery %}
+    var endpoint = '/api/course/attendanceHistory'
+    var graphData = []
+    var labels = []
+
+    $.ajax({
+      method: "GET",
+      url: endpoint,
+      data: {
+        courseid: {{course.id}}
+      },
+      success: function(data){
+        labels = data.labels
+        graphData = data.attendance
+        setChart(labels, graphData)
+
+      },
+      error: function(error_data){
+        console.log("error")
+        console.log(error_data)
+      }
+    })
+
+  function setChart(labels, graphData) {
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '% Present',
+                data: graphData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+  }
+  {% endblock %}
+</script>
 
 {% block content %}
   <h1> {{course.title}} </h1>
@@ -37,10 +102,35 @@
   </dl>
 
   <h2>Recent Course Events: </h2>
-
   <dl class=row>
     {% for event in events %}
     <dt class="col-sm-9"><a href="{% url 'viewEvent' event_id=event.id %}" class="list-group-item list-group-item-action">{{ event.date }} ({{ event.start_time }})</a></dt>
     {% endfor %}
   </dl>
+
+  <h2>Graphical Statistics: </h2>
+  <dl class=row>
+    <dt class="col-sm-9"><button type="button" data-toggle="modal" data-target="#attendancePatterns" class="list-group-item list-group-item-action"><b>Attendance Patterns</b></dt>
+  </dl>
+
+  <!-- Attendance Patterns -->
+  <div class="modal fade" id="attendancePatterns" tabindex="-1" role="dialog" aria-labelledby="attendancePatternsLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Attendance Patterns</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <canvas id="myChart" width="600" height="300"></canvas>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 {% endblock content %}
