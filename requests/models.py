@@ -96,6 +96,7 @@ class Attendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     attended = models.BooleanField(default=False)
+    scanned_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.student} ({self.event})'

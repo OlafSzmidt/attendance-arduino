@@ -25,6 +25,12 @@ def calculate_percentage_attendance_for_event(event):
             students_marked_present += 1
 
     if students_marked_present == 0:
-        return 0
+        return {
+            'number': students_marked_present,
+            'percentage': 0,
+        }
     else:
-        return students_enrolled / students_marked_present * 100
+        return {
+            'number': students_marked_present,
+            'percentage': students_enrolled / students_marked_present * 100,
+        }

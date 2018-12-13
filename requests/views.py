@@ -12,7 +12,8 @@ from requests.forms import (ScanCardValidationForm, AddANewLecturerForm,
                             AddEventForm)
 from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
                              Course)
-from requests.helpers import generate_random_username
+from requests.helpers import (generate_random_username,
+                              calculate_percentage_attendance_for_event)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -184,11 +185,10 @@ def viewEventView(request, event_id):
     event = Event.objects.filter(id=event_id).first()
     students_enrolled = event.course.students.all().count()
 
-
     stats = {
         'students_enrolled': students_enrolled,
-        'students_marked_present': students_marked_present,
-        'students_present_percentage': calculate_percentage_attendance_for_event(event),
+        'students_marked_present': calculate_percentage_attendance_for_event(event)['number'],
+        'students_present_percentage': calculate_percentage_attendance_for_event(event)['percentage'],
     }
 
     return render(request, 'requests/single_event.html', {'event': event, 'stats': stats})

@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from .views import (cardScanView, homePageView, myCoursesView,
                     addLecturerStaffView, viewCourseView, viewEventView,
                     addStudentAndCardView, addCourseView, addEventView)
-from .views_api import CourseAttendanceData
+from .views_api import CourseAttendanceData, EventTimeScannedData
 urlpatterns = [
     path('', homePageView, name='homePage'),
     path('cardScan/', cardScanView, name='cardScan'),
@@ -20,4 +20,5 @@ urlpatterns = [
     path('addedStudentSuccess/', TemplateView.as_view(template_name='requests/addedStudentSuccess.html'), name='addedStudentSuccess'),
     path('addedEventSuccess/', TemplateView.as_view(template_name='requests/addedEventSuccess.html'), name='addedEventSuccess'),
     path('api/course/attendanceHistory/', CourseAttendanceData.as_view()),
+    path('api/event/whenDoStudentsMark/', EventTimeScannedData.as_view()),
 ]

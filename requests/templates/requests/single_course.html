@@ -24,8 +24,8 @@
     })
 
   function setChart(labels, graphData) {
-    var ctx = document.getElementById("myChart").getContext('2d');
-    var myChart = new Chart(ctx, {
+    var ctx = document.getElementById("attendancePatternsChart").getContext('2d');
+    var attendancePatternsChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
@@ -124,7 +124,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <canvas id="myChart" width="600" height="300"></canvas>
+          <canvas id="attendancePatternsChart" width="600" height="300"></canvas>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
