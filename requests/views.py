@@ -2,7 +2,7 @@ import logging
 import csv
 import io
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
@@ -12,7 +12,8 @@ from requests.forms import (ScanCardValidationForm, AddANewLecturerForm,
                             AddEventForm)
 from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
                              Course)
-from requests.helpers import generate_random_username
+from requests.helpers import (generate_random_username,
+                              calculate_percentage_attendance_for_event)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -126,8 +127,9 @@ def addEventView(request):
             return HttpResponseRedirect('/addedEventSuccess/')
         else:
             return HttpResponse('Incorrect data submitted!')
-            
+
     return render(request, 'requests/add_event.html', {'form': AddEventForm})
+
 @login_required
 def myCoursesView(request):
     logged_in_user = request.user
@@ -182,22 +184,12 @@ def viewCourseView(request, course_title):
 @login_required
 def viewEventView(request, event_id):
     event = Event.objects.filter(id=event_id).first()
-    attendances = Attendance.objects.filter(event=event)
     students_enrolled = event.course.students.all().count()
-    students_marked_present = 0
-    for attendance in attendances:
-        if(attendance.attended):
-            students_marked_present += 1
-
-    if students_marked_present == 0:
-        students_present_percentage = 0
-    else:
-        students_present_percentage = students_enrolled / students_marked_present * 100
 
     stats = {
         'students_enrolled': students_enrolled,
-        'students_marked_present': students_marked_present,
-        'students_present_percentage': students_present_percentage,
+        'students_marked_present': calculate_percentage_attendance_for_event(event)['number'],
+        'students_present_percentage': calculate_percentage_attendance_for_event(event)['percentage'],
     }
 
     return render(request, 'requests/single_event.html', {'event': event, 'stats': stats})
