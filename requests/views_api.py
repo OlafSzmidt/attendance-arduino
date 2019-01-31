@@ -36,9 +36,9 @@ class EventTimeScannedData(APIView):
         start_time = event.start_time
         end_time = event.end_time
         start_td = datetime.timedelta(hours=start_time.hour,
-                                        minutes=start_time.minute,
-                                        seconds=start_time.second,
-                                        microseconds=start_time.microsecond)
+                                      minutes=start_time.minute,
+                                      seconds=start_time.second,
+                                      microseconds=start_time.microsecond)
 
         end_td = datetime.timedelta(hours=end_time.hour,
                                     minutes=end_time.minute,

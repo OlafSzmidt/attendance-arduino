@@ -20,23 +20,36 @@
   <header class="site-header">
     <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
       <div class="container">
-        <a class="navbar-brand mr-4" href="/">Attendance Taking System</a>
+        <a class="navbar-brand mr-4" href="{% url 'homePage' %}">Attendance Taking System</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarToggle">
           <div class="navbar-nav mr-auto">
-            <a class="nav-item nav-link" href="{% url 'homePage' %}">Home</a>
-            {% if user.is_authenticated %}
-              <a class="nav-item nav-link" href="{% url 'addEvent' %}">Add Event</a>
-            {% endif %}
             {% if user.is_staff %}
-              <a class="nav-item nav-link" href="{% url 'addLecturer' %}">Add Lecturer</a>
-              <a class="nav-item nav-link" href="{% url 'addStudentAndCard' %}">Add Student</a>
-              <a class="nav-item nav-link" href="{% url 'addCourseView' %}">Add Course</a>
-            {% else %}
-              <a class="nav-item nav-link" href="{% url 'myCourses' %}">Courses</a>
+            <div class="dropdown px-2">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Admin Actions
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="{% url 'addLecturer' %}">Add Lecturer</a>
+                <a class="dropdown-item" href="{% url 'addStudentAndCard' %}">Add Student</a>
+                <a class="dropdown-item" href="{% url 'addCourseView' %}">Add Course</a>
+              </div>
+            </div>
             {% endif %}
+            {% if user.is_authenticated %}
+            <div class="dropdown px-2">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                My Courses
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="{% url 'addEvent' %}">Add Event</a>
+                <a class="dropdown-item" href="{% url 'myCourses' %}">View Course Information</a>
+              </div>
+            </div>
+            {% endif %}
+
           </div>
           <!-- Navbar Right Side -->
           <div class="navbar-nav">

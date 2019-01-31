@@ -129,6 +129,7 @@ def addEventView(request):
             return HttpResponse('Incorrect data submitted!')
 
     return render(request, 'requests/add_event.html', {'form': AddEventForm})
+
 @login_required
 def myCoursesView(request):
     logged_in_user = request.user
