@@ -30,7 +30,7 @@
         data: {
             labels: labels,
             datasets: [{
-                label: '% Present',
+                label: 'Time in percentage scales',
                 data: graphData,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
@@ -85,23 +85,16 @@
 
  <h2>Graphical Statistics: </h2>
  <dl class=row>
-   <dt class="col-sm-9"><button type="button" data-toggle="modal" data-target="#studentsMarkingAttendance" class="list-group-item list-group-item-action"><b>When did students mark attendance?</b></dt>
+   <dt class="col-sm-9"><button type="button" data-toggle="modal" data-target=".bd-example-modal-lg" class="list-group-item list-group-item-action"><b>When did students mark attendance?</b></dt>
  </dl>
 
-
- <!-- Attendance Patterns -->
- <div class="modal fade" id="studentsMarkingAttendance" tabindex="-1" role="dialog" aria-labelledby="studentsMarkingAttendanceLabel" aria-hidden="true">
-   <div class="modal-dialog" role="document">
+ <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="studentsMarkingAttendance" aria-hidden="true">
+   <div class="modal-dialog modal-lg">
      <div class="modal-content">
-       <div class="modal-header">
+       <div class="modal-header centre">
          <h5 class="modal-title" id="exampleModalLabel">When did students mark attendance?</h5>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-           <span aria-hidden="true">&times;</span>
-         </button>
        </div>
-       <div class="modal-body">
-         <canvas id="attendancePatternsChart" width="600" height="300"></canvas>
-       </div>
+       <canvas id="attendancePatternsChart" width="600" height="300"></canvas>
        <div class="modal-footer">
          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
        </div>
