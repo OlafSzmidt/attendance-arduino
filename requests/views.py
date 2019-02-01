@@ -13,7 +13,8 @@ from requests.forms import (ScanCardValidationForm, AddANewLecturerForm,
 from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
                              Course)
 from requests.helpers import (generate_random_username,
-                              calculate_percentage_attendance_for_event)
+                              calculate_percentage_attendance_for_event,
+                              send_one_time_username_and_password)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -101,10 +102,17 @@ def addLecturerStaffView(request):
             new_user = User.objects.create_user(username=random_username,
                                                 password=random_password)
 
+            first_name = submitted_form.cleaned_data['first_name']
+            second_name = submitted_form.cleaned_data['second_name']
+            email = submitted_form.cleaned_data['email']
+
             # User created, now a lecturer object
-            lecturer = Lecturer.objects.create(first_name=submitted_form.cleaned_data['first_name'],
-                                               second_name=submitted_form.cleaned_data['second_name'],
-                                               user=new_user)
+            lecturer = Lecturer.objects.create(first_name=first_name,
+                                               second_name=second_name,
+                                               user=new_user, email=email)
+
+            send_one_time_username_and_password(first_name, second_name, email,
+                                                random_username, random_password)
 
             return HttpResponseRedirect('/addedLecturerSuccess/')
         else:

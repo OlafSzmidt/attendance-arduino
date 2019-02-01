@@ -40,6 +40,7 @@ class Lecturer(Person):
     '''Subclass of Person, difference in functionality from Student is that
     these objects have a 1-1 relationship with a User.'''
     user = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
+    email = models.EmailField()
 
 class LectureHall(models.Model):
     '''A location model to be connected to courses to then view as options.'''

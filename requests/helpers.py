@@ -1,5 +1,6 @@
 from random import choice
 from string import ascii_lowercase, digits
+from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from .models import Attendance
 
@@ -34,3 +35,15 @@ def calculate_percentage_attendance_for_event(event):
             'number': students_marked_present,
             'percentage': students_enrolled / students_marked_present * 100,
         }
+
+def send_one_time_username_and_password(name, surname, lecturer_email, username,
+                                        password):
+    send_mail(
+        'Your Temporary Credentials for Attendance System',
+        f'Dear {name} {surname}, \n \nThis email contains your temporary password as well '
+        f'as your username. Please change this password on the system to a desired one after '
+        f'logging in. \n \nUsername: {username} \nPassword: {password}',
+        'attendance@cs.uom.ac.uk',
+        [lecturer_email],
+        fail_silently=False,
+    )

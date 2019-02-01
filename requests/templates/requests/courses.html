@@ -2,6 +2,7 @@
 
 {% block content %}
   {% if user.is_authenticated %}
+    <h2>My Courses:</h2>
     <div class="list-group">
     {% for course in courses %}
     <a href="{% url 'viewCourse' course_title=course.title %}" class="list-group-item list-group-item-action">{{course.title}}</a>

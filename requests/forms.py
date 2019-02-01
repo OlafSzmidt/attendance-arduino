@@ -34,10 +34,11 @@ class ScanCardValidationForm(forms.Form):
 class AddANewLecturerForm(forms.ModelForm):
     class Meta:
         model = Lecturer
-        fields = ['first_name' , 'second_name']
+        fields = ['first_name' , 'second_name', 'email']
         widgets = {
                 'first_name': forms.TextInput(attrs={'class': 'form-control'}),
                 'second_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
     courses_to_lead = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Course.objects.all())

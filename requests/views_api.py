@@ -59,7 +59,6 @@ class EventTimeScannedData(APIView):
 
         for i in range(5):
             top_bracket_time = low_bracket_time + datetime.timedelta(seconds=difference)
-            make_aware(top_bracket_time)
 
             attendances_in_range = Attendance.objects.filter(event=event,
                                                              scanned_at__gte=low_bracket_time,
