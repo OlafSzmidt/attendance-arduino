@@ -55,6 +55,7 @@ class EventTimeScannedData(APIView):
                                              start_time.second)
 
         result_data = []
+        students_found_so_far = 0
 
         for i in range(5):
             top_bracket_time = low_bracket_time + datetime.timedelta(seconds=difference)
@@ -63,11 +64,16 @@ class EventTimeScannedData(APIView):
                                                              scanned_at__gte=low_bracket_time,
                                                              scanned_at__lt=top_bracket_time).count()
 
+            students_found_so_far += attendances_in_range
+
             result_data.append(attendances_in_range)
 
             low_bracket_time = top_bracket_time
 
-        labels = ["0-20%, 20-40%, 40-60%, 60-80%, 80-100%"]
+        manually_marked = Attendance.objects.filter(event=event).count() - students_found_so_far
+        result_data.append(manually_marked)
+
+        labels = ["0-20%", "20-40%", "40-60%", "60-80%", "80-100%", "Manually Marked"]
 
         return Response({
             'labels': labels,
