@@ -1,10 +1,13 @@
 import logging
 import csv
 import io
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from requests.forms import (ScanCardValidationForm, AddANewLecturerForm,
@@ -201,3 +204,20 @@ def viewEventView(request, event_id):
     }
 
     return render(request, 'requests/single_event.html', {'event': event, 'stats': stats})
+
+@login_required
+def change_password_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password has been changed successfully!')
+            return redirect('homePage')
+        else:
+            messages.error(request, 'Please correct the error.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'requests/change_password.html', {
+        'form': form
+    })

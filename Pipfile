@@ -8,6 +8,7 @@ name = "pypi"
 [packages]
 django = "==2.1.2"
 djangorestframework = "*"
+django-crispy-forms = "*"
 
 [requires]
 python_version = "3.6"
