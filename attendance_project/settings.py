@@ -25,7 +25,9 @@ SECRET_KEY = '*2toemmfhn-40@brc4^&$zo0ijigm4b^65xx&zs0i)r#yq*4)f'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '192.168.1.248',
+]
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
@@ -46,7 +48,6 @@ INSTALLED_APPS = [
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
