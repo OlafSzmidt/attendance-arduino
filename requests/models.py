@@ -71,7 +71,7 @@ class Course(models.Model):
 class NFCCard(models.Model):
     '''An NFC card which is being scanned by the arduino and is connected to a
     single student'''
-    card_id = models.IntegerField(null=False, unique=True)
+    card_id = models.CharField(null=False, unique=True, max_length=21)
     student = models.OneToOneField(Student, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
