@@ -17,7 +17,8 @@ from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
                              Course)
 from requests.helpers import (generate_random_username,
                               calculate_percentage_attendance_for_event,
-                              send_one_time_username_and_password)
+                              send_one_time_username_and_password,
+                              find_students_with_less_than_50_attendance)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ def addCourseView(request):
             io_string = io.StringIO(decoded_file)
             csv_reader = csv.reader(io_string, delimiter=',')
 
+            # TODO: check if this actually works, trouble finding students...
             for row in csv_reader:
                 if line_counter == 0:
                     line_counter += 1
@@ -158,12 +160,13 @@ def cardScanView(request):
     if request.method != 'POST':
         return HttpResponse(status=405)
 
+    request_data = {'card_id': str(request.body, 'utf-8')}
     # Create a form to validate incoming data.
     # This will check key names, key types, value types.
-    post_data_form = ScanCardValidationForm(request.POST)
+    post_data_form = ScanCardValidationForm(request_data)
     if post_data_form.is_valid():
         # Find student using the card ID
-        student = Student.objects.filter(nfccard__card_id=request.POST['card_id']).first()
+        student = Student.objects.filter(nfccard__card_id=request_data['card_id']).first()
         if student is None:
             return HttpResponse('No student found!')
 
@@ -190,7 +193,15 @@ def cardScanView(request):
 def viewCourseView(request, course_title):
     course = Course.objects.filter(title=course_title).first()
     events = Event.objects.filter(course=course)
-    return render(request, 'requests/single_course.html', {'course': course, 'lecture_halls': course.lectures.all(), 'lab_halls': course.labs.all(), 'events': events})
+    students_less_than_50 = find_students_with_less_than_50_attendance(course)
+
+    return render(request, 'requests/single_course.html', {'course': course,
+                                                           'lecture_halls': course.lectures.all(),
+                                                           'lab_halls': course.labs.all(),
+                                                           'events': events,
+                                                           'less_than_50': students_less_than_50,
+                                                           }
+                 )
 
 @login_required
 def viewEventView(request, event_id):
