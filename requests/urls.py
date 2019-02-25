@@ -3,7 +3,8 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from .views import (cardScanView, homePageView, myCoursesView,
                     addLecturerStaffView, viewCourseView, viewEventView,
-                    addStudentAndCardView, addCourseView, addEventView, change_password_view)
+                    addStudentAndCardView, addCourseView, addEventView,
+                    change_password_view, export_under_50_csv)
 from .views_api import CourseAttendanceData, EventTimeScannedData
 urlpatterns = [
     path('', homePageView, name='homePage'),
@@ -20,6 +21,7 @@ urlpatterns = [
     path('addedStudentSuccess/', TemplateView.as_view(template_name='requests/addedStudentSuccess.html'), name='addedStudentSuccess'),
     path('addedEventSuccess/', TemplateView.as_view(template_name='requests/addedEventSuccess.html'), name='addedEventSuccess'),
     path('changePassword/', change_password_view, name='change_password'),
+    path('exportCsv/<str:course_title>/', export_under_50_csv, name='exportUnder50'),
     path('api/course/attendanceHistory/', CourseAttendanceData.as_view()),
     path('api/event/whenDoStudentsMark/', EventTimeScannedData.as_view()),
 ]

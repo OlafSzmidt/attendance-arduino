@@ -150,7 +150,7 @@
           {% endfor %}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary">Export CSV</button>
+          <a class="btn btn-primary" href="{% url 'exportUnder50' course.title %}" role="button">Export CSV</a>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
