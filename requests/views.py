@@ -232,3 +232,17 @@ def change_password_view(request):
     return render(request, 'requests/change_password.html', {
         'form': form
     })
+
+def export_under_50_csv(request, course_title):
+    course = Course.objects.filter(title=course_title).first()
+    list_of_students_under_50 = find_students_with_less_than_50_attendance(course)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="under_50_{}.csv"'.format(course_title)
+    writer = csv.writer(response)
+    writer.writerow(['First Name', 'Second Name'])
+
+    for student in list_of_students_under_50:
+        writer.writerow([student.first_name, student.second_name])
+
+    return response

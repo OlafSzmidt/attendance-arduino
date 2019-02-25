@@ -39,7 +39,7 @@ class AddANewLecturerForm(forms.ModelForm):
                 'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
-    courses_to_lead = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Course.objects.all(), required=False)
+    courses_to_lead = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Course.objects.exclude(leader__isnull=False), required=False)
 
 class AddANewStudentForm(forms.ModelForm):
     class Meta:
