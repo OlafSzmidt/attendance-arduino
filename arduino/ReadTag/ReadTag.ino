@@ -9,12 +9,12 @@
 
 
 // Network Settings!
-#define SSID      "OLKAROLKA123"
-#define KEY       "85386C52C2"
+#define SSID      "Attendance"
+#define KEY       "attendancesystem"
 // WIFLY_AUTH_OPEN / WIFLY_AUTH_WPA1 / WIFLY_AUTH_WPA1_2 / WIFLY_AUTH_WPA2_PSK
 #define AUTH      WIFLY_AUTH_WPA2_PSK
 #define HTTP_GET_URL "http://httpbin.org/get?hello=world"
-#define HTTP_POST_URL "http://192.168.1.248:8000/cardScan/"
+#define HTTP_POST_URL "http://192.168.43.205:8000/cardScan/"
 
 
 // NFC init

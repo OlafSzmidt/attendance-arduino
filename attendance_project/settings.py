@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '192.168.1.248',
+    '192.168.43.205',
+    '127.0.0.1',
 ]
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
