@@ -2,7 +2,8 @@ from django import forms
 from .models import Lecturer, Course, Student, NFCCard, Event
 
 class ScanCardValidationForm(forms.Form):
-    card_id = forms.IntegerField()
+    # TODO: max card id length?
+    card_id = forms.CharField()
 
     def is_valid(self):
 
@@ -18,12 +19,9 @@ class ScanCardValidationForm(forms.Form):
         # TODO; check all names
 
         # First check if card_id key exists with a right type
+        # TODO: strip whitespace
         try:
             id_provided = self.cleaned_data['card_id']
-            if not isinstance(id_provided, int):
-                # TODO: more checking here for correct ID once we know what it is
-                self._errors['card_id_invalid_type'] = 'Card ID value provided is not an integer.'
-                return False
         except KeyError:
             self._errors['no_card_id'] = 'Card ID key not provided in the POSTed data.'
             return False
@@ -41,7 +39,7 @@ class AddANewLecturerForm(forms.ModelForm):
                 'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
-    courses_to_lead = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Course.objects.all())
+    courses_to_lead = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Course.objects.all(), required=False)
 
 class AddANewStudentForm(forms.ModelForm):
     class Meta:
@@ -57,7 +55,7 @@ class AddANFCCardForm(forms.ModelForm):
         model = NFCCard
         fields = ['card_id']
         widgets = {
-                'card_id': forms.NumberInput(attrs={'class': 'form-control'}),
+                'card_id': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 class AddEventForm(forms.ModelForm):

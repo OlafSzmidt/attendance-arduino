@@ -2,7 +2,7 @@ from random import choice
 from string import ascii_lowercase, digits
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
-from .models import Attendance
+from .models import Attendance, Event
 
 def generate_random_username(length=16, chars=ascii_lowercase+digits, split=4, delimiter='-'):
 
@@ -36,6 +36,7 @@ def calculate_percentage_attendance_for_event(event):
             'percentage': students_enrolled / students_marked_present * 100,
         }
 
+
 def send_one_time_username_and_password(name, surname, lecturer_email, username,
                                         password):
     send_mail(
@@ -47,3 +48,21 @@ def send_one_time_username_and_password(name, surname, lecturer_email, username,
         [lecturer_email],
         fail_silently=False,
     )
+
+
+def find_students_with_less_than_50_attendance(course):
+    non_attending_students = []
+    course_events = Event.objects.filter(course=course)
+
+    for student in course.students.all():
+        current_student_attendance_count = 0
+
+        for event in course_events:
+            attendance_record = Attendance.objects.filter(student=student, event=event).first()
+            if attendance_record and attendance_record.attended:
+                current_student_attendance_count += 1
+
+        if current_student_attendance_count < course_events.count() / 2:
+            non_attending_students.append(student)
+
+    return non_attending_students
