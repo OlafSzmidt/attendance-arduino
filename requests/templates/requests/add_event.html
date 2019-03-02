@@ -1,5 +1,10 @@
 {% extends "requests/base.html" %}
 
+{% block extrahead %}
+{{ form.media }}
+{% endblock %}
+#
+
 {% block content %}
 <h2>Add a new event</h2>
 <form method="post">
