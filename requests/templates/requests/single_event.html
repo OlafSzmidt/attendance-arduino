@@ -83,9 +83,10 @@
     <dd class="col-sm-9">{{ event.notes }}</dd>
  </dl>
 
- <h2>Graphical Statistics: </h2>
+ <h2>Statistics: </h2>
  <dl class=row>
    <dt class="col-sm-9"><button type="button" data-toggle="modal" data-target=".bd-example-modal-lg" class="list-group-item list-group-item-action"><b>When did students mark attendance?</b></dt>
+   <dt class="col-sm-9"><button type="button" data-toggle="modal" data-target="#noAttendanceStudents" class="list-group-item list-group-item-action"><b>Which students did not attend?</b></dt>
  </dl>
 
  <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="studentsMarkingAttendance" aria-hidden="true">
@@ -96,6 +97,28 @@
        </div>
        <canvas id="attendancePatternsChart" width="600" height="300"></canvas>
        <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div class="modal fade" id="noAttendanceStudents" tabindex="-1" role="dialog" aria-labelledby="attendancePatternsLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">Which students did not attend?</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+         {% for student in stats.students_not_present %}
+           {{ student }} <br>
+         {% endfor %}
+       </div>
+       <div class="modal-footer">
+         <a class="btn btn-primary" href="{% url 'exportNoAttendance' event.course.title event.date event.start_time  %}" role="button">Export CSV</a>
          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
        </div>
      </div>

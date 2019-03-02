@@ -18,7 +18,8 @@ from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
 from requests.helpers import (generate_random_username,
                               calculate_percentage_attendance_for_event,
                               send_one_time_username_and_password,
-                              find_students_with_less_than_50_attendance)
+                              find_students_with_less_than_50_attendance,
+                              find_students_not_present_for_event)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -207,12 +208,14 @@ def viewCourseView(request, course_title):
 def viewEventView(request, event_id):
     event = Event.objects.filter(id=event_id).first()
     students_enrolled = event.course.students.all().count()
+    students_not_present = find_students_not_present_for_event(event)
 
     stats = {
         'students_enrolled': students_enrolled,
+        'students_not_present': students_not_present,
         'students_marked_present': calculate_percentage_attendance_for_event(event)['number'],
         'students_present_percentage': calculate_percentage_attendance_for_event(event)['percentage'],
-    }
+        }
 
     return render(request, 'requests/single_event.html', {'event': event, 'stats': stats})
 
@@ -233,6 +236,7 @@ def change_password_view(request):
         'form': form
     })
 
+
 def export_under_50_csv(request, course_title):
     course = Course.objects.filter(title=course_title).first()
     list_of_students_under_50 = find_students_with_less_than_50_attendance(course)
@@ -244,5 +248,26 @@ def export_under_50_csv(request, course_title):
 
     for student in list_of_students_under_50:
         writer.writerow([student.first_name, student.second_name])
+
+    return response
+
+
+def export_no_attendance(request, event_course_title, event_date, event_start_time):
+    # Find all courses matching the title of the course. Returns a queryset.
+    course = Course.objects.filter(title=event_course_title).first()
+
+    # Based on the queryset and other date/time information, find the event.
+    event = Event.objects.filter(date=event_date, start_time=event_start_time,
+                                  course=course).first()
+
+    students_not_found = find_students_not_present_for_event(event)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="students_not_present_{}.csv"'.format(event_course_title)
+    writer = csv.writer(response)
+    writer.writerow(['Student Full Name'])
+
+    for student in students_not_found:
+        writer.writerow([student])
 
     return response
