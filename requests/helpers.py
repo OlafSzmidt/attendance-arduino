@@ -33,8 +33,30 @@ def calculate_percentage_attendance_for_event(event):
     else:
         return {
             'number': students_marked_present,
-            'percentage': students_enrolled / students_marked_present * 100,
+            'percentage': (students_marked_present / students_enrolled) * 100,
         }
+
+
+def find_students_not_present_for_event(event):
+    '''
+    Finds all the students that are not present for the event provided
+    and returns a list of them.
+    '''
+
+    # Populate a list of all names of students on the course.
+    students_enrolled = event.course.students.all()
+    student_names = []
+
+    for student in students_enrolled:
+        student_names.append(str(student))
+
+    attendances = Attendance.objects.filter(event=event)
+
+    for attendance in attendances:
+        if attendance.attended:
+            student_names.remove(str(attendance.student))
+
+    return student_names
 
 
 def send_one_time_username_and_password(name, surname, lecturer_email, username,

@@ -1,6 +1,7 @@
 import logging
 import csv
 import io
+import datetime
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -18,7 +19,8 @@ from requests.models import (Student, Lecturer, NFCCard, Event, Attendance,
 from requests.helpers import (generate_random_username,
                               calculate_percentage_attendance_for_event,
                               send_one_time_username_and_password,
-                              find_students_with_less_than_50_attendance)
+                              find_students_with_less_than_50_attendance,
+                              find_students_not_present_for_event)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -116,6 +118,8 @@ def addLecturerStaffView(request):
                                                second_name=second_name,
                                                user=new_user, email=email)
 
+            submitted_form.cleaned_data['courses_to_lead'].update(leader=lecturer)
+
             send_one_time_username_and_password(first_name, second_name, email,
                                                 random_username, random_password)
 
@@ -177,10 +181,27 @@ def cardScanView(request):
         logger.info(f'Student courses found: {student_courses}')
 
         # Find the event that the student is enrolling for
-        student_event = Event.objects.filter(course__in=student_courses)
+
+        now = datetime.datetime.now().time()
+
+        student_events = Event.objects.filter(course__in=student_courses)
+
+        found_event = None
+
+        for single_event in student_events:
+            if now <= single_event.end_time and now >= single_event.start_time:
+                print("found")
+                found_event = single_event
+                break
 
         # Mark attendance and create an object
-        attendance = Attendance.objects.create(student=student, event=student_event.first(), attended=True)
+        if found_event is None:
+            return HttpResponse('404')
+
+        query_attendance = Attendance.objects.filter(student=student, event=found_event)
+
+        if len(query_attendance) == 0:
+            attendance = Attendance.objects.create(student=student, event=found_event, attended=True)
 
         return HttpResponse(f'Student attendance marked. The name is {student.first_name} {student.second_name}')
     else:
@@ -207,12 +228,14 @@ def viewCourseView(request, course_title):
 def viewEventView(request, event_id):
     event = Event.objects.filter(id=event_id).first()
     students_enrolled = event.course.students.all().count()
+    students_not_present = find_students_not_present_for_event(event)
 
     stats = {
         'students_enrolled': students_enrolled,
+        'students_not_present': students_not_present,
         'students_marked_present': calculate_percentage_attendance_for_event(event)['number'],
         'students_present_percentage': calculate_percentage_attendance_for_event(event)['percentage'],
-    }
+        }
 
     return render(request, 'requests/single_event.html', {'event': event, 'stats': stats})
 
@@ -233,6 +256,7 @@ def change_password_view(request):
         'form': form
     })
 
+
 def export_under_50_csv(request, course_title):
     course = Course.objects.filter(title=course_title).first()
     list_of_students_under_50 = find_students_with_less_than_50_attendance(course)
@@ -244,5 +268,26 @@ def export_under_50_csv(request, course_title):
 
     for student in list_of_students_under_50:
         writer.writerow([student.first_name, student.second_name])
+
+    return response
+
+
+def export_no_attendance(request, event_course_title, event_date, event_start_time):
+    # Find all courses matching the title of the course. Returns a queryset.
+    course = Course.objects.filter(title=event_course_title).first()
+
+    # Based on the queryset and other date/time information, find the event.
+    event = Event.objects.filter(date=event_date, start_time=event_start_time,
+                                  course=course).first()
+
+    students_not_found = find_students_not_present_for_event(event)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="students_not_present_{}.csv"'.format(event_course_title)
+    writer = csv.writer(response)
+    writer.writerow(['Student Full Name'])
+
+    for student in students_not_found:
+        writer.writerow([student])
 
     return response

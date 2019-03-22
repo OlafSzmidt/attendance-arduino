@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'requests.apps.RequestsConfig',
     'rest_framework',
     'crispy_forms',
+    'bootstrap_datepicker_plus',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

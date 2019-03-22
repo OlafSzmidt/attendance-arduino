@@ -1,3 +1,4 @@
+from bootstrap_datepicker_plus import DatePickerInput
 from django import forms
 from .models import Lecturer, Course, Student, NFCCard, Event
 
@@ -63,7 +64,7 @@ class AddEventForm(forms.ModelForm):
         model = Event
         fields = ['date', 'start_time', 'end_time', 'notes', 'course']
         widgets = {
-                'date': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+                'date': DatePickerInput(),
                 'start_time': forms.TimeInput(attrs={'class': 'form-control'}),
                 'end_time': forms.TimeInput(attrs={'class': 'form-control'}),
                 'notes': forms.TextInput(attrs={'class': 'form-control'}),

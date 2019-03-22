@@ -72,7 +72,9 @@
       <div class="col-md-4">
         <div class="content-section">
           <h3>System Status</h3>
-          <p>System status fine</p>
+          <p class="text-success">05/03/2018 - System working fine.</p>
+          <p class="text-danger">03/03/2018 - Login functionality has an unexpected error!</p>
+          <p class="text-success">01/03/2018 - New system version deployed.</p>
         </div>
       </div>
     </div>
@@ -89,6 +91,9 @@
     {% block jquery %}{% endblock %}
   })
   </script>
+
+  {% block extrahead %}
+  {% endblock %}
 
 </body>
 

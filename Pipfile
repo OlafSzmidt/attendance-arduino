@@ -9,6 +9,7 @@ name = "pypi"
 django = "==2.1.2"
 djangorestframework = "*"
 django-crispy-forms = "*"
+django-bootstrap-datepicker-plus = "*"
 
 [requires]
 python_version = "3.6"
