@@ -1,6 +1,7 @@
 import logging
 import csv
 import io
+import datetime
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -117,6 +118,8 @@ def addLecturerStaffView(request):
                                                second_name=second_name,
                                                user=new_user, email=email)
 
+            submitted_form.cleaned_data['courses_to_lead'].update(leader=lecturer)
+
             send_one_time_username_and_password(first_name, second_name, email,
                                                 random_username, random_password)
 
@@ -178,10 +181,27 @@ def cardScanView(request):
         logger.info(f'Student courses found: {student_courses}')
 
         # Find the event that the student is enrolling for
-        student_event = Event.objects.filter(course__in=student_courses)
+
+        now = datetime.datetime.now().time()
+
+        student_events = Event.objects.filter(course__in=student_courses)
+
+        found_event = None
+
+        for single_event in student_events:
+            if now <= single_event.end_time and now >= single_event.start_time:
+                print("found")
+                found_event = single_event
+                break
 
         # Mark attendance and create an object
-        attendance = Attendance.objects.create(student=student, event=student_event.first(), attended=True)
+        if found_event is None:
+            return HttpResponse('404')
+
+        query_attendance = Attendance.objects.filter(student=student, event=found_event)
+
+        if len(query_attendance) == 0:
+            attendance = Attendance.objects.create(student=student, event=found_event, attended=True)
 
         return HttpResponse(f'Student attendance marked. The name is {student.first_name} {student.second_name}')
     else:

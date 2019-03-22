@@ -13,7 +13,6 @@
 #define KEY       "attendancesystem"
 // WIFLY_AUTH_OPEN / WIFLY_AUTH_WPA1 / WIFLY_AUTH_WPA1_2 / WIFLY_AUTH_WPA2_PSK
 #define AUTH      WIFLY_AUTH_WPA2_PSK
-#define HTTP_GET_URL "http://httpbin.org/get?hello=world"
 #define HTTP_POST_URL "http://192.168.43.205:8000/cardScan/"
 
 
@@ -35,6 +34,8 @@ void setup(void) {
     Serial.begin(9600);
     
     Serial.println("Attendance Monitor");
+    pinMode(9, OUTPUT);
+
     
     // wifly needs a delay for initlization.
     delay(3000);
@@ -52,7 +53,8 @@ void setup(void) {
     }
     
     delay(5000);
-
+    noTone(9);
+    
     nfc.begin();
 
     // Command disables welcome message from Seeed Studio WiFi shield.
@@ -69,13 +71,6 @@ void loop(void) {
     {
         NfcTag tag = nfc.read();
         Serial.println(tag.getUidString());
-
-        // There are C++ libraries that can construct JSON objects or strings
-        // but we are trying to keep the arduino as lightweight as possible so
-        // constructing it ourselves. However, no standard library (std) in the Uno
-        // means this is difficult. 
-
-        // Note: sprintf is unsafe
         
         Serial.println("\r\n\r\nTry to post data to url - " HTTP_POST_URL);
         Serial.println("-------------------------------");
@@ -94,10 +89,22 @@ void loop(void) {
         
         while (http.post(HTTP_POST_URL, __tag, 10000) < 0) {
         }
+
+        String response = "";
         while (wifly.receive((uint8_t *)&get, 1, 1000) == 1) {
-          Serial.print(get);
+          response += get;
+        }
+        
+        if(response.endsWith("404*CLOS*")) {
+          tone(9, 100);
+          delay(1000);
+          noTone(9);
+        }
+        else {
+          Serial.println("nah");
+          tone(9, 1000);
+          delay(1000);
+          noTone(9);
         }
     }
-    
-    delay(1500);
 }
