@@ -5,6 +5,12 @@ from requests.models import (Event, Attendance, Course)
 from .helpers import calculate_percentage_attendance_for_event
 
 class CourseAttendanceData(APIView):
+    """
+    Custom APIView used by a template graph. When a course template is rendered,
+    a GET request is sent to this API endpoint with a 'courseid' as a parameter.
+    Attendance is calculate and returned as JSON to be rendered by the template
+    modules.
+    """
     authentication_classes = []
     permission_classes = []
 
@@ -25,7 +31,15 @@ class CourseAttendanceData(APIView):
 
         return Response(data)
 
+
 class EventTimeScannedData(APIView):
+    """
+    Custom APIView used by a template graph. When an event template is rendered,
+    a GET request is sent to this API endpoint with a 'eventid' as a parameter.
+    It uses time delta's to calculate "brackets" of time in which students have
+    signed their attendance in the event. It then returns those as a JSON to the
+    template to be rendered appropriately.
+    """
     authentication_classes = []
     permission_classes = []
 

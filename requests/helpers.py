@@ -65,7 +65,7 @@ def send_one_time_username_and_password(name, surname, lecturer_email, username,
         'Your Temporary Credentials for Attendance System',
         f'Dear {name} {surname}, \n \nThis email contains your temporary password as well '
         f'as your username. Please change this password on the system to a desired one after '
-        f'logging in. \n \nUsername: {username} \nPassword: {password}',
+        f'logging in. Visit /changePassword/ for this. \n \nUsername: {username} \nPassword: {password}',
         'attendance@cs.uom.ac.uk',
         [lecturer_email],
         fail_silently=False,

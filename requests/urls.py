@@ -7,6 +7,11 @@ from .views import (cardScanView, homePageView, myCoursesView,
                     change_password_view, export_under_50_csv, export_no_attendance)
 from .views_api import CourseAttendanceData, EventTimeScannedData
 
+
+# Entry point of the application. Runs a regex pattern match to see if the path of
+# the URL matches any specified in the list below. If it does, a connected view is
+# rendered.
+
 urlpatterns = [
     path('', homePageView, name='homePage'),
     path('cardScan/', cardScanView, name='cardScan'),
