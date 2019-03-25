@@ -30,4 +30,4 @@ it at the correct location (ie. root of the folder `attendance-arduino`).
 To listen to the output of the arduino, you can open the Arduino IDE and its
 in built Serial Monitor. UART BAUD rate is set at 9600, so make sure you listen
 at that rate. You may have to set the port and the device in the settings correctly
-so that the IDE recognises your Arduino. 
+so that the IDE recognises your Arduino.
