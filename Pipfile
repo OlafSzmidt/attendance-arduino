@@ -6,7 +6,7 @@ name = "pypi"
 [dev-packages]
 
 [packages]
-django = "==2.1.11"
+django = "==2.2.10"
 djangorestframework = "*"
 django-crispy-forms = "*"
 django-bootstrap-datepicker-plus = "*"
